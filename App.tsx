@@ -14,13 +14,10 @@ export default function App() {
   const [grid, setGrid] = useState(Array(3).fill(null).map(() => Array(3).fill('')));
   const [text,setText] = useState<string>();
   
-  let isSolving : boolean = false; 
-  const staticIsSolving = isSolving;
-  
-  const getIsSolving = () : boolean =>{return isSolving;}
+  const [isSolving, setIsSolving] = useState<boolean>(false);
+
 
   // Handle input change
-  
   const handleInputChange = (row: number, col: number, value: string) => {
     // Make a copy of the grid to avoid mutating the original state directly
     const validValue = ["1", "2", "3", "4", "5", "6", "7", "8", ""]; // Valid numbers including empty string
@@ -34,22 +31,20 @@ export default function App() {
 
   // Handle button press
   const handleButtonPress = async () => {       
-    isSolving = true;
-    
+    setIsSolving(true);
     let initialState : stateProps= {grid:grid,heuristicValue:calculateHeurisicValue(grid)};        
     if(!isValidGrid(grid)) return;
-    let x =  solveProblem(initialState,setGrid,getIsSolving, setText);
-    console.log("vv");
+    solveProblem(initialState,setGrid,isSolving, setText);
     
   };
    
   const onClear = () => {
-    isSolving = false;
+    setIsSolving(false);
     const clearedGrid = Array(3).fill(null).map(() => Array(3).fill(''));    
     setGrid(clearedGrid); 
   };
   const onReset = () =>{
-    isSolving = false;
+    setIsSolving(false);
     
     const numbers = ['', ...Array.from({ length: 8 }, (_, i) => (i + 1).toString())];
     const newGrid = Array(3)
@@ -85,7 +80,7 @@ export default function App() {
   };
   // BAŞLANGIÇ DEĞERLERİNİ KURAR
 useEffect(() => {
-  isSolving = false;
+  setIsSolving(false);
   onReset();
 }, []);
 

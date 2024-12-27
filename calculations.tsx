@@ -108,14 +108,13 @@ const getNewState = ( currentState:stateProps) : stateProps =>{
 }
 
 
-export const solveProblem = async ( initialState:stateProps,  setGrid: React.Dispatch<React.SetStateAction<any[][]>>, getIsSolving: () =>  boolean , setText: React.Dispatch<React.SetStateAction<string | undefined>>) : Promise<void> =>{
+export const solveProblem = async ( initialState:stateProps,  setGrid: React.Dispatch<React.SetStateAction<any[][]>>, getIsSolving:   boolean , setText: React.Dispatch<React.SetStateAction<string | undefined>>) : Promise<void> =>{
   
   
   let dynamicState = initialState;
-  let isSolving : boolean =  getIsSolving();
-  while (dynamicState.heuristicValue != 0 && getIsSolving()) {
-    isSolving = getIsSolving();
-    console.log("solveProblem isSolving: "+getIsSolving());
+  let isSolving : boolean =  getIsSolving;
+  while (dynamicState.heuristicValue != 0 && isSolving) {
+    console.log("solveProblem isSolving: "+ isSolving);
     
     let previousState = dynamicState;
     dynamicState = getNewState(dynamicState);
