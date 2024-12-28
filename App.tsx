@@ -39,7 +39,6 @@ export default function App() {
     let initialState : stateProps= {grid:grid,heuristicValue:calculateHeurisicValue(grid)};        
     if(!isValidGrid(grid)) return;
     let x =  solveProblem(initialState,setGrid,getIsSolving, setText);
-    console.log("vv");
     
   };
    
