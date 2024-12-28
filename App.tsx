@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, TextInput, View, Button, Text } from 'react-native';
 import { calculateHeurisicValue, solveProblem } from './calculations';
+import { traverseTree } from './gridList';
 
 interface stateProps{
   grid: Array<Array<string>>;
   heuristicValue: Number;
 }
+
 
 
 export default function App() {
@@ -18,6 +20,7 @@ export default function App() {
 
   // Handle input change
   
+
   const handleInputChange = (row: number, col: number, value: string) => {
     // Make a copy of the grid to avoid mutating the original state directly
     const validValue = ["1", "2", "3", "4", "5", "6", "7", "8", ""]; // Valid numbers including empty string
@@ -36,10 +39,22 @@ export default function App() {
     let initialState : stateProps= {grid:grid,heuristicValue:calculateHeurisicValue(grid)};        
     if(!isValidGrid(grid)) return;
     let x =  solveProblem(initialState,setGrid,isSolving, setText);
-    console.log("vv");
     
   };
    
+  const handleButtonPress2 = async (
+          isSolving:boolean, 
+          setText: React.Dispatch<React.SetStateAction<string | undefined>>,
+          grid: Array<Array<string>>, 
+          setGrid: React.Dispatch<React.SetStateAction<any[][]>>
+      ) => {       
+        isSolving = true;      
+        let initialState : stateProps= {grid:grid,heuristicValue:calculateHeurisicValue(grid)};        
+        if(!isValidGrid(grid)) return;
+        
+        traverseTree(initialState,setGrid,isSolving,setText);
+        
+      };
   const onClear = () => {
     isSolving = false;
     const clearedGrid = Array(3).fill(null).map(() => Array(3).fill(''));    
@@ -83,6 +98,7 @@ export default function App() {
   };
   // BAŞLANGIÇ DEĞERLERİNİ KURAR
 useEffect(() => {
+  
   isSolving = false;
   onReset();
 }, []);
@@ -111,7 +127,7 @@ useEffect(() => {
       </View>
       
       <View style={styles.buttonContainer}>
-          <Button title="Press Me" onPress={handleButtonPress} />
+          <Button title="Press Me" onPress={ () => handleButtonPress2(isSolving,setText,grid,setGrid)} />
       </View>
       
       <View style={styles.buttonContainer}>

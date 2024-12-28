@@ -138,7 +138,6 @@ export const solveProblem = async ( initialState:stateProps,  setGrid: React.Dis
  
   while (dynamicState.heuristicValue != 0 && isSolving) {
     isSolving = isSolving;
-    console.log("solveProblem isSolving: "+isSolving);
 
     let previousState = dynamicState;
     dynamicState = getNewState(dynamicState);
