@@ -1,8 +1,12 @@
+import { useEffect } from "react";
 
 interface stateProps{
     grid: Array<Array<string>>;
     heuristicValue: Number;
   }
+
+
+  // HAMLELER ARASINA VAKİT KOYMAK İÇİN VAR
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
   
     // MANHATTAN DISTANCE KULLANARAK DURUMLARIN/TABLOLARIN DEĞERİNİ BULUR
@@ -14,18 +18,18 @@ export const calculateHeurisicValue = ( grid :Array<Array<string>>):Number  =>{
 
         // "row" SATIRININ İÇERİĞİNİ GEZER, "cell"  GEZİLMEKTE OLAN HANE/HÜCRE, "colIndex" GEZİLMEKTE OLAN HANENİN SÜTUNUN SIRASI (0,1,2 olabilir)
         row.forEach((cell : any, colIndex : number) => {
-          
-          
+
+
           if (cell !== '') {
             const num = parseInt(cell, 10);  // HANEDEKİ SAYIYI "number" TİPİNE ÇEVİR
             if (!isNaN(num)) {
-             
+
               // HANEDEKİ SAYININ, DEĞERİNE GÖRE, OLMASI GEREKEN SATIRI VE SÜTUNU BUL
               const targetRow = Math.floor(num / 3);
               const targetCol = num % 3;
-              
+
               // HANEDEKİ SAYININ OLMASI GEREKEN YERE OLAN UZAKLIĞINI AL,[ |şuanki satır - olması gereken satır| + |şuanki kolon - olması gereken kolon| ]
-              const manhattanDistance = Math.abs(rowIndex - targetRow) + Math.abs(colIndex - targetCol);                  
+              const manhattanDistance = Math.abs(rowIndex - targetRow) + Math.abs(colIndex - targetCol);
               result += manhattanDistance;
             }
           }
@@ -34,14 +38,14 @@ export const calculateHeurisicValue = ( grid :Array<Array<string>>):Number  =>{
     
       return result;
     };
-    
-    // EN İYİ HAMLEYİ, BOŞ HANENİN KOMŞULARI İLE YERDEĞİŞTİRDİĞİ DURUMLARIN HEURİSTİC DEĞERLERİNİ KIYASLAYARAK SAPTAR. EN DÜŞÜK DEĞERİ OLAN GRİD'İ RETURN EDER
+
+    // EN İYİ HAMLEYİ, BOŞ HANENİN KOMŞULARI İLE YERDEĞİŞTİRDİĞİ DURUMLARIN HEURISTIC DEĞERLERİNİ KIYASLAYARAK SAPTAR. EN DÜŞÜK DEĞERİ OLAN GRİD'İ RETURN EDER
 const bestPossibleMove = (currentGrid: Array<Array<string>>) => {
       
       // BU KISIM BOŞ HANENİN KONUMUNU BULUR 
       let emptyCellRow = -1;
       let emptyCellCol = -1;
-    
+
       // Find the position of the empty cell in the grid
       outerLoop: for (let row = 0; row < 3; row++) {
         for (let col = 0; col < 3; col++) {
@@ -52,7 +56,7 @@ const bestPossibleMove = (currentGrid: Array<Array<string>>) => {
           }
         }
       }
-    
+
       // BOŞ HANENİN KOMUŞULARININ KONUMLARI 
       const neighbors: { row: number; col: number }[] = [
         { row: emptyCellRow - 1, col: emptyCellCol }, // Up
@@ -60,73 +64,99 @@ const bestPossibleMove = (currentGrid: Array<Array<string>>) => {
         { row: emptyCellRow, col: emptyCellCol - 1 }, // Left
         { row: emptyCellRow, col: emptyCellCol + 1 }, // Right
       ];
-    
+
+      // BİR OLASI DURUMLAR VE DEĞERLERİ TABLOSU OLUŞTUR
+      let neighborsTable: stateProps[] = [];
 
       let bestHeuristic: Number = 999999;
-      let bestGrid: Array<any>[3] | null = null;
-    
-      // KOMŞULARI GEZ
+
+      // KOMŞULARI GEZ, TABLOYU DURUMLARLA DOLDURMAK İÇİN
       neighbors.forEach((neighbor) => {
-        
+
         // KOMŞU YOKSA RETURN
-        if ( !((neighbor.row >= 0) &&( neighbor.row < 3) && (neighbor.col >= 0) &&( neighbor.col < 3))) return;
-          
+        if ( !((neighbor.row >= 0) &&( neighbor.row < 3) && (neighbor.col >= 0) &&( neighbor.col < 3))) {
+          return
+        };
 
 
-          // ŞUAN Kİ GRİD'İN KOPYASINI OLUŞTUR. HANELERİN YERİNİ, BUNUN ÜZERİNDE DEĞİŞTİRECEK
+          // ŞUAN Kİ GRİD'İN KOPYASINI OLUŞTUR. HANELERİN YERİNİ, BUNUN ÜZERİNDE DEĞİŞİM YAPACAK 
         const newGrid = currentGrid.map((row) => row.slice()); // Create a copy of the grid
         
         // GEZİLMEKTE OLAN KOMŞU İLE BOŞ HÜCRENİN YERİNİ DEĞİŞTİR
         [newGrid[emptyCellRow][emptyCellCol], newGrid[neighbor.row][neighbor.col]] = [ newGrid[neighbor.row][neighbor.col], newGrid[emptyCellRow][emptyCellCol],];
         
-
         // OLUŞAN YENİ DURUMUN DEĞERİNİ ÖLÇ
         const newHeuristicValue = calculateHeurisicValue(newGrid);
 
-        // YENİ DEĞER DAHA DÜŞÜK İSE, GÜNCELLE
-        if (newHeuristicValue <= bestHeuristic) {
-          bestHeuristic = newHeuristicValue;
-          bestGrid = newGrid;
+        // EĞER TABLO YOKSA OLUŞTUR
+        if(!neighborsTable) {
+          neighborsTable = [];
         }
-        
-      });
-    
+        // TABLOYU DOLDURMAYA BAŞLA
+        neighborsTable.push({grid: newGrid,heuristicValue: newHeuristicValue});
+
+        // YENİ DEĞER DAHA DÜŞÜK İSE, GÜNCELLE
+       if (newHeuristicValue < bestHeuristic) {
+        bestHeuristic = newHeuristicValue;
+        }
+
+
+       });
+
+       // TABLODAN IDEAL OLMAYAN DEĞERLERİ ÇIKAR
+       neighborsTable = neighborsTable.filter(
+        (neighborState: stateProps) => neighborState.heuristicValue === bestHeuristic
+      );
+      // TABLODAN 
+      const randomGrid : Array<Array<string>> = neighborsTable[Math.floor(Math.random() * neighborsTable.length)].grid;
+
       // Return the grid with the lowest heuristic value
-      return bestGrid;
+      return randomGrid;
 };
-    
+
 const getNewState = ( currentState:stateProps) : stateProps =>{
-    
+
     const currentGrid = currentState.grid;
-    
+
     const newGrid = bestPossibleMove(currentGrid);
-    
+
     const newHeuristicValue = calculateHeurisicValue(newGrid);
     const newState:stateProps = {grid:newGrid,heuristicValue:newHeuristicValue};
 
     return newState;
 }
 
+export const solveProblem = async (
+  initialState: stateProps, // BAŞLANGIÇ STATE'İ
+  setGrid: React.Dispatch<React.SetStateAction<any[][]>>,// GRİD GÜNCELLEYEN FONKSİYON
+  isSolvingRef: React.MutableRefObject<boolean>, // DEVAM EDİLDİĞİNİ BELİRLER
+  setText: React.Dispatch<React.SetStateAction<string | undefined>>, // TEXT'İ GÜNCELLER
+  setIsSolving: React.Dispatch<React.SetStateAction<boolean>> // BİTİNCE FALSE YAPMAK İÇİN
+): Promise<void> => {
 
-export const solveProblem = async ( initialState:stateProps,  setGrid: React.Dispatch<React.SetStateAction<any[][]>>, getIsSolving:   boolean , setText: React.Dispatch<React.SetStateAction<string | undefined>>) : Promise<void> =>{
-  
-  
+
   let dynamicState = initialState;
-  let isSolving : boolean =  getIsSolving;
-  while (dynamicState.heuristicValue != 0 && isSolving) {
-    console.log("solveProblem isSolving: "+ isSolving);
-    
-    let previousState = dynamicState;
-    dynamicState = getNewState(dynamicState);
-    setGrid(dynamicState.grid);
-    updateText(previousState.grid,dynamicState.grid, setText)
-    await sleep(1000)
+
+  while (true) { 
+    if (!isSolvingRef.current) { // EĞER DURDURULDUYSA LOOP'DAN ÇIK
+      break;
+    }
+    if(dynamicState.heuristicValue == 0){ // ÇÖZÜLÜNCE  RETURN
+      setIsSolving(false);
+      setText("Solved");      
+      return;
+    } 
+
+
+    let previousState = dynamicState; // TEXT'İ GÜNCELLEMEK İÇİN ÖNCEKİ STATE'İ AL 
+    dynamicState = getNewState(dynamicState); // YENİ STATE'İ AL
+    setGrid(dynamicState.grid); // GRİD'İ GÜNCELLE 
+    updateText(previousState.grid, dynamicState.grid, setText); // TEXT'İ GÜNCELLE
+    await sleep(1000);// 1 SANİYE BEKLE
   }
 
-return ;
-}
-
-
+  return;
+};
 
 /**
  * Bu fonksiyon ekranda sunulan <Text> objesinin içeriğini, hamle sırasında yer değiştiren sayıla günceller
@@ -153,8 +183,10 @@ const updateText = ( previousGrid : Array<Array<string>>, nextGrid : Array<Array
   const emptyCoordinates = findEmptyCell(); // BOŞLUĞUN KOORDİNATLARI
   
   if (emptyCoordinates  !== null&& emptyCoordinates.row !== null && emptyCoordinates.col  !== null) {
-    
+
     let movedNumber = nextGrid[emptyCoordinates.row][emptyCoordinates.col]; // YENİ GRİD'DE, ÖNCEKİ GRİD'İN BOŞLUĞUNUN YERİNİ ALAN SAYI
-    setText("Number "+movedNumber+" moved") ;    
-  }    
+    setText("Number "+movedNumber+" moved") ;
+  }
 }
+
+

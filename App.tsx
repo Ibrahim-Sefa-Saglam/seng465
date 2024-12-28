@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, TextInput, View, Button, Text } from 'react-native';
 import { calculateHeurisicValue, solveProblem } from './calculations';
 
@@ -15,48 +15,61 @@ export default function App() {
   const [text,setText] = useState<string>();
   
   const [isSolving, setIsSolving] = useState<boolean>(false);
+  const isSolvingRef = useRef<boolean>(isSolving);
 
 
-  // Handle input change
-  const handleInputChange = (row: number, col: number, value: string) => {
-    // Make a copy of the grid to avoid mutating the original state directly
-    const validValue = ["1", "2", "3", "4", "5", "6", "7", "8", ""]; // Valid numbers including empty string
-    if(!validValue.includes(value)) return;
+  // EKRANDAKİ GRİD'E DEĞER GİRİLİNCE ÇALIŞIR
+  const handleInputChange = (row: number, col: number, value: string) => {// DEĞİŞTİRİLEN HANENİN VERİLERİ
+    
+    const validValue = ["1", "2", "3", "4", "5", "6", "7", "8", ""]; // GEÇERLİ DEĞERLER
+    if(!validValue.includes(value)){ // GİRİLEN GEÇERLİ DEĞERLERDEN DEĞİLSE RETURN
+    return;      
+    }
 
-    const newGrid = grid.map((r, rIndex) => 
+    const newGrid = grid.map((r, rIndex) => // YENİ GRİD
       rIndex === row ? r.map((cell, cIndex) => (cIndex === col ? value : cell)) : r
     );    
-    setGrid(newGrid);
-  };
+    setGrid(newGrid);// GRİD'İ GÜNCELLER
+  };//***************
 
-  // Handle button press
+  // PRESS BUTONUNA BASINCA ÇALIŞIR
   const handleButtonPress = async () => {       
-    setIsSolving(true);
-    let initialState : stateProps= {grid:grid,heuristicValue:calculateHeurisicValue(grid)};        
-    if(!isValidGrid(grid)) return;
-    solveProblem(initialState,setGrid,isSolving, setText);
     
-  };
-   
+    if(isSolvingRef.current) { // EĞER ZATEN ÇÖZĞLMEKTEYSE RETURN
+      return; 
+    } 
+    
+    setIsSolving(true);// BAŞLAMAK İÇİN TRUE
+    if(!isValidGrid(grid)){ // EĞER GİRİLEN DEĞERLERDE ÇAKIŞMA VARSA RETURN
+      setText("Enter each number only once");
+      return;
+    }
+    let initialState : stateProps= {grid:grid,heuristicValue:calculateHeurisicValue(grid)}; // BAŞLANGIÇ İÇİN STATE YAPAR
+    solveProblem(initialState, setGrid, isSolvingRef, setText, setIsSolving);// PROBLEMİ ÇÖZDÜREN FONKSİYON    
+  };//***************
+
+  // TABLOYU TEMİZLER, "" İLE DOLDIRARAK
   const onClear = () => {
     setIsSolving(false);
     const clearedGrid = Array(3).fill(null).map(() => Array(3).fill(''));    
     setGrid(clearedGrid); 
-  };
+  };//***************
+
+  // TABLOYA RESET ATAR
   const onReset = () =>{
     setIsSolving(false);
     
-    const numbers = ['', ...Array.from({ length: 8 }, (_, i) => (i + 1).toString())];
+    const numbers = ['', ...Array.from({ length: 8 }, (_, i) => (i + 1).toString())];// SAYILARI DİZER
     const newGrid = Array(3)
       .fill(null)
       .map((_, rowIndex) => numbers.slice(rowIndex * 3, rowIndex * 3 + 3));
     
-    setGrid(newGrid);
+    setGrid(newGrid);// GRİD'I GÜNCELLER
   
     const heuristic = calculateHeurisicValue(newGrid);
-    setState({ grid: newGrid, heuristicValue: heuristic });
+    setState({ grid: newGrid, heuristicValue: heuristic });// STATE'İ GĞÜNCELLER
     setText("");
-  }
+  }//***************
 
   const isValidGrid = (grid: Array<Array<string>>): boolean => {
     const flatGrid = grid.flat(); // Flatten the 2D array into a 1D array
@@ -83,15 +96,19 @@ useEffect(() => {
   setIsSolving(false);
   onReset();
 }, []);
+useEffect(() => {
+  isSolvingRef.current = isSolving;
+}, [isSolving]);
+
 
   return (
     
     <View style={styles.container}>
-      {/* Render the 3x3 grid */}
-      {grid.map((row, rowIndex) => (
-        <View key={rowIndex} style={styles.row}>
-          {row.map((cell, colIndex) => (
-            <TextInput
+    
+      {grid.map((row, rowIndex) => (// GRİD'İN SATIRLARINI SIRALAR
+        <View key={rowIndex} style={styles.row}> {/**GRİD'IN SATIRLARINI BARINDIRIR / SATIRLARIN KENDİSİDİR */}
+          {row.map((cell, colIndex) => ( // GRİD'İN SÜTUNLARINI SIRALAR
+            <TextInput /**GRİD'IN SÜTUNLARININ  KENDİSİDİR */
               key={colIndex}
               style={styles.cell}
               value={cell}
@@ -103,7 +120,8 @@ useEffect(() => {
         </View>
       ))}
       
-      <View style={styles.textContainer}>
+
+      <View style={styles.textContainer}> 
           <Text>{text ||"Fill the grid width different numbers (1-8)"}</Text>
       </View>
       
