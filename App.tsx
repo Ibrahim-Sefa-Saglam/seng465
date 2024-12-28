@@ -15,9 +15,6 @@ export default function App() {
   const [text,setText] = useState<string>();
   
   let isSolving : boolean = false; 
-  const staticIsSolving = isSolving;
-  
-  const getIsSolving = () : boolean =>{return isSolving;}
 
   // Handle input change
   
@@ -38,7 +35,7 @@ export default function App() {
     
     let initialState : stateProps= {grid:grid,heuristicValue:calculateHeurisicValue(grid)};        
     if(!isValidGrid(grid)) return;
-    let x =  solveProblem(initialState,setGrid,getIsSolving, setText);
+    let x =  solveProblem(initialState,setGrid,isSolving, setText);
     console.log("vv");
     
   };
@@ -48,6 +45,7 @@ export default function App() {
     const clearedGrid = Array(3).fill(null).map(() => Array(3).fill(''));    
     setGrid(clearedGrid); 
   };
+
   const onReset = () =>{
     isSolving = false;
     

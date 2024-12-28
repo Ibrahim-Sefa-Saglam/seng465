@@ -3,6 +3,11 @@ interface stateProps{
     grid: Array<Array<string>>;
     heuristicValue: Number;
   }
+  interface stateListProps{   
+    parentState: stateProps | null; 
+    thisState: stateProps;
+    nextNeighbors: stateProps[];
+}
 
 
   // HAMLELER ARASINA VAKİT KOYMAK İÇİN VAR
@@ -126,14 +131,14 @@ const getNewState = ( currentState:stateProps) : stateProps =>{
 }
 
 
-export const solveProblem = async ( initialState:stateProps,  setGrid: React.Dispatch<React.SetStateAction<any[][]>>, getIsSolving: () =>  boolean , setText: React.Dispatch<React.SetStateAction<string | undefined>>) : Promise<void> =>{
+export const solveProblem = async ( initialState:stateProps,  setGrid: React.Dispatch<React.SetStateAction<any[][]>>,isSolving: boolean , setText: React.Dispatch<React.SetStateAction<string | undefined>>) : Promise<void> =>{
 
 
   let dynamicState = initialState;
-  let isSolving : boolean =  getIsSolving();
-  while (dynamicState.heuristicValue != 0 && getIsSolving()) {
-    isSolving = getIsSolving();
-    console.log("solveProblem isSolving: "+getIsSolving());
+ 
+  while (dynamicState.heuristicValue != 0 && isSolving) {
+    isSolving = isSolving;
+    console.log("solveProblem isSolving: "+isSolving);
 
     let previousState = dynamicState;
     dynamicState = getNewState(dynamicState);
@@ -144,8 +149,6 @@ export const solveProblem = async ( initialState:stateProps,  setGrid: React.Dis
 
 return ;
 }
-
-
 
 /**
  * Bu fonksiyon ekranda sunulan <Text> objesinin içeriğini, hamle sırasında yer değiştiren sayıla günceller
@@ -177,3 +180,5 @@ const updateText = ( previousGrid : Array<Array<string>>, nextGrid : Array<Array
     setText("Number "+movedNumber+" moved") ;
   }
 }
+
+
