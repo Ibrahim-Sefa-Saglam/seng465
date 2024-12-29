@@ -8,6 +8,7 @@ interface stateProps{
 }
 
 
+
 export default function App() {
   // Initialize a 3x3 grid with empty strings
   const [state, setState] = useState<stateProps>();
