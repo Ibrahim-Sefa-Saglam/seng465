@@ -91,36 +91,36 @@ useEffect(() => {
   return (
     
     <View style={styles.container}>
-      {/* Render the 3x3 grid */}
-      {grid.map((row, rowIndex) => (
-        <View key={rowIndex} style={styles.row}>
-          {row.map((cell, colIndex) => (
-            <TextInput
-              key={colIndex}
-              style={styles.cell}
-              value={cell}
-              onChangeText={(text) => handleInputChange(rowIndex, colIndex, text)}
-              keyboardType="numeric"
-              maxLength={1}
-            />
-          ))}
+        {/* Render the 3x3 grid */}
+        {grid.map((row, rowIndex) => (
+          <View key={rowIndex} style={styles.row}>
+            {row.map((cell, colIndex) => (
+              <TextInput
+                key={colIndex}
+                style={styles.cell}
+                value={cell}
+                onChangeText={(text) => handleInputChange(rowIndex, colIndex, text)}
+                keyboardType="numeric"
+                maxLength={1}
+              />
+            ))}
+          </View>
+        ))}
+
+        <View style={styles.textContainer}>
+            <Text>{text ||"Fill the grid with different numbers (1-8)"}</Text>
         </View>
-      ))}
-      
-      <View style={styles.textContainer}>
-          <Text>{text ||"Fill the grid width different numbers (1-8)"}</Text>
-      </View>
-      
-      <View style={styles.buttonContainer}>
-          <Button title="Press Me" onPress={handleButtonPress} />
-      </View>
-      
-      <View style={styles.buttonContainer}>
-        <Button title="Clear" onPress={onClear} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button title="Reset" onPress={onReset} />
-      </View>
+
+        <View style={styles.buttonContainer}>
+            <Button title="Press Me" onPress={handleButtonPress} />
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Button title="Clear" onPress={onClear} />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button title="Reset" onPress={onReset} />
+        </View>
     </View>
   );
 }
