@@ -93,7 +93,7 @@ export default function App() {
   };
   // BAŞLANGIÇ DEĞERLERİNİ KURAR
 useEffect(() => {
-  setIsSolving(false);
+  isSolvingRef.current= false;
   onReset();
 }, []);
 useEffect(() => {
