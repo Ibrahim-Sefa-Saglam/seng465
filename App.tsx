@@ -106,7 +106,7 @@ useEffect(() => {
     <View style={styles.container}>
     
       {grid.map((row, rowIndex) => (// GRİD'İN SATIRLARINI SIRALAR
-        <View key={rowIndex} style={styles.row}> {/**GRİD'IN SATIRLARINI BARINDIRIR / SATIRLARIN KENDİSİDİR */}
+        <View key={rowIndex} style={styles.row}> 
           {row.map((cell, colIndex) => ( // GRİD'İN SÜTUNLARINI SIRALAR
             <TextInput /**GRİD'IN SÜTUNLARININ  KENDİSİDİR */
               key={colIndex}
