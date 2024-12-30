@@ -34,12 +34,13 @@ export default function App() {
 
   // PRESS BUTONUNA BASINCA ÇALIŞIR
   const handleButtonPress = async () => {       
+    console.log("1");
     
     if(isSolvingRef.current) { // EĞER ZATEN ÇÖZĞLMEKTEYSE RETURN
       return; 
     } 
     
-    setIsSolving(true);// BAŞLAMAK İÇİN TRUE
+    isSolvingRef.current = true
     if(!isValidGrid(grid)){ // EĞER GİRİLEN DEĞERLERDE ÇAKIŞMA VARSA RETURN
       setText("Enter each number only once");
       return;
@@ -50,15 +51,15 @@ export default function App() {
 
   // TABLOYU TEMİZLER, "" İLE DOLDIRARAK
   const onClear = () => {
-    setIsSolving(false);
+    isSolvingRef.current = false;
     const clearedGrid = Array(3).fill(null).map(() => Array(3).fill(''));    
     setGrid(clearedGrid); 
   };//***************
 
   // TABLOYA RESET ATAR
   const onReset = () =>{
-    setIsSolving(false);
     
+    isSolvingRef.current = false;
     const numbers = ['', ...Array.from({ length: 8 }, (_, i) => (i + 1).toString())];// SAYILARI DİZER
     const newGrid = Array(3)
       .fill(null)
@@ -94,6 +95,7 @@ export default function App() {
   // BAŞLANGIÇ DEĞERLERİNİ KURAR
 useEffect(() => {
   isSolvingRef.current= false;
+  setIsSolving(false);
   onReset();
 }, []);
 useEffect(() => {

@@ -141,8 +141,11 @@ export const solveProblem = async (
     if (!isSolvingRef.current) { // EĞER DURDURULDUYSA LOOP'DAN ÇIK
       break;
     }
+    console.log(dynamicState.heuristicValue);
+    
     if(dynamicState.heuristicValue == 0){ // ÇÖZÜLÜNCE  RETURN
       setIsSolving(false);
+      isSolvingRef.current= false;
       setText("Solved");      
       return;
     } 
